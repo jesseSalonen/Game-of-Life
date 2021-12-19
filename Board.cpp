@@ -33,7 +33,7 @@ void Board::reviveCell(const int x, const int y) {
     if (mBoard[y]->at(x) == true) cout << "Cell (" << x << "," << y << ") already alive, no changes made to the board!" << endl;
     else {
         mBoard[y]->at(x) = true;
-        cout << "Cell (" << x << "," << y << ") revived!";
+        cout << "Cell (" << x << "," << y << ") revived!" << endl;
     }
 }
 
@@ -47,7 +47,7 @@ int Board::processNextState() {
         for (int j = 0; j < mBoardSize; j++) {
             for (int y = i - 1; y <= i + 1; y++) {
                 for (int x = j - 1; x <= j + 1; x++) {
-                    if (y >= 0 && x >= 0 && y < mBoardSize && x < mBoardSize) {
+                    if (y >= 0 && x >= 0 && y < mBoardSize && x < mBoardSize && (y != i || x != j)) {
                         if (mBoard[y]->at(x) == true) neighborCount++;
                     }
                 }
@@ -58,10 +58,14 @@ int Board::processNextState() {
                     newBoard.back()->push_back(false);
                     changeCount++;
                 }
+                else newBoard.back()->push_back(true);
             }
             else {
-                if (neighborCount == 3) newBoard.back()->push_back(true);
-                changeCount++;
+                if (neighborCount == 3) {
+                    newBoard.back()->push_back(true);
+                    changeCount++;
+                }
+                else newBoard.back()->push_back(false);
             }
             neighborCount = 0;
         }
