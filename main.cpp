@@ -7,15 +7,28 @@
 using std::cin;
 using std::cout;
 using std::endl;
-
+// Function for checking the user input
 int checkInput(const std::string &number, const int min, const int max, bool &exitApp);
-
+// main handles the user interaction and passes operations to the Board-class which does the game calculations
+/*
+string boardSize: size of the play area, (5-100)
+string xAxis, yAxis: variables for user input on coordinates
+string nextStep: variable stating the type of advancement in the game, either automatic or user-controlled
+string continueGame: variable for user's input on whether the game should continue or end
+bool exit: bool for exit checking, if true, stop executing the code and exit the app
+bool initializingDone: bool for checking if the user is happy with the starting state of the game
+int initialCellCount: amount of cells the user has inserted in to the starting state, min = 1
+int changedCellsAmount: counter for changed cells in a single state change, if 0, game is completed
+int stepCount: counter for steps in a single game
+int userInputPlaceHolder: placeholder for checkInput's return value.
+    Used when same input would otherwise be checked multiple times, possibly resulting in multiple same error messages
+*/
 int main() {
     std::string boardSize, xAxis, yAxis, nextStep, continueGame;
     bool exit = false;
     bool initializingDone;
     int initialCellCount, changedCellsAmount, stepCount, userInputPlaceholder;
-
+    // continue looping the game until user wants to exit
     do {
         cout << "Welcome to the Game of Life!" << endl;
         cout << "Please follow the instructions and the game will simulate a single Game of Life" << endl;
@@ -41,7 +54,7 @@ int main() {
                 cout << "All the cells are 'dead' by default" << endl;
                 cout << "Please insert 'alive' cells to initialize a starting state" << endl;
                 cout << "When done with inputting alive cells, type 'done'\n" << endl;
-
+                // Ask for x-axis number, also check for 'done' meaning user is ready
                 do {
                     cout << "Give cell's x-axis number (horizontal, range 0-" << board.getBoardSize() - 1 << "):";
                     getline(cin, xAxis);
@@ -61,7 +74,7 @@ int main() {
                         userInputPlaceholder = checkInput(yAxis, 0, board.getBoardSize() - 1, exit);
                         // If input ok, 'revive' cell with given coordinates
                         if (userInputPlaceholder > 0) {
-                            // Clear the console
+                            // Clear the console by moving the text out of sight, and then re-positioning the cursor to the top-left corner
                             cout << "\033[2J\033[1;1H";
                             board.reviveCell(stoi(xAxis), stoi(yAxis));
                             initialCellCount++;
@@ -82,13 +95,14 @@ int main() {
                         cout << "This is the board after " << stepCount << " steps!" << endl;
                         cout << "To continue to the next state, press enter" << endl;
                         cout << "To automatically progress through the game, type 'auto'" << endl;
-
+                        // Ask for a command to step to next state
                         do {
                             cout << "Command:";
                             getline(cin, nextStep);
                             if (nextStep != "" && nextStep != "auto") cout << "Invalid input! Press either only enter, or type 'auto' and press enter" << endl;
                         } while (nextStep != "" && nextStep != "auto");
                     }
+                    // Do calculations, and save the amount of changes made
                     changedCellsAmount = board.processNextState();
                     stepCount++;
                     if (nextStep == "auto") {
@@ -99,10 +113,12 @@ int main() {
                     // Clear the console
                     cout << "\033[2J\033[1;1H";
                 } while (changedCellsAmount != 0);
+
                 cout << "Game completed!" << endl;
                 cout << "Steps: " << stepCount << endl;
                 board.printBoard();
                 cout << endl;
+                // Ask if the user wants to play another game
                 do {
                     cout << "To play again, press 'a', otherwise exit with 'q'";
                     getline(cin, continueGame);
