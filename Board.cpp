@@ -1,6 +1,6 @@
 #include "Board.h"
 #include <iostream>
-
+#include <string>
 using std::cout;
 using std::endl;
 // Default constructor with board size of 10
