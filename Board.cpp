@@ -3,8 +3,8 @@
 
 using std::cout;
 using std::endl;
-// Default constructor with board size of 9
-Board::Board() : mBoardSize{ 9 } {
+// Default constructor with board size of 10
+Board::Board() : mBoardSize{ 10 } {
     for (int i = 0; i < mBoardSize; i++) {
         mBoard.push_back(std::make_shared<std::vector<bool>>());
         for (int j = 0; j < mBoardSize; j++) {
@@ -86,30 +86,31 @@ int Board::processNextState() {
 }
 // method for printing the game board
 void Board::printBoard() const {
-    for (int y = 0; y < mBoardSize * 2 + 2; y++) {
+    for (int y = 0; y < mBoardSize * 2 + 3; y++) {
         for (int x = 0; x < mBoardSize * 2 + 3; x++) {
-            // If printing the first row, print column numbers
-            if (y == 0) {
-                if ((x % 2 != 0 && x >= 3) || int((x-2) / 2) > 10) {
-                    cout << int((x-2) / 2);
-                    if (int((x-2) / 2) < 10) cout << " ";
-                    x++;
+            // If printing the first two rows, print column numbers
+            if (y <= 1) {
+                if (x % 2 != 0 && x >= 3) {
+                    if (int((x-2) / 2) >= 10 && y == 0) cout << std::to_string(int((x-2) / 2)).front();
+                    else if (int((x-2) / 2) < 10 && y == 1) cout << int((x-2) / 2);
+                    else if (int((x-2) / 2) >= 10 && y == 1) cout << std::to_string(int((x-2) / 2)).back();
+                    else cout << " ";
                 }
                 else cout << " ";
             }
             // If not the first row and printing the first two symbols, print row numbers
             else if (x <= 1) {
-                if (y % 2 == 0) {
-                    cout << int((y-2) / 2);
-                    if (int((y-2) / 2) <= 9) cout << " ";
+                if (y % 2 != 0) {
+                    cout << int((y-3) / 2);
+                    if (int((y-3) / 2) <= 9) cout << " ";
                     x++;
                 }
                 else cout << " ";
             }
             // If not the first row and is a cell row, print either a cell wall or a cell value
-            else if (y % 2 == 0) {
+            else if (y % 2 != 0) {
                 if (x % 2 == 0) cout << "|";
-                else (mBoard[(y-2) / 2]->at((x-2) / 2)) ? cout << "#" : cout << " ";
+                else (mBoard[(y-3) / 2]->at((x-2) / 2)) ? cout << "#" : cout << " ";
             }
             // If not the first row and not in a cell row, print a horizontal line
             else cout << "-";

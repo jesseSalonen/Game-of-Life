@@ -35,9 +35,9 @@ int main() {
         cout << "To exit the application, simply type 'q' in an input field\n" << endl;
         // Validate the input
         do {
-            cout << "Please choose a size for the board (5-100):";
+            cout << "Please choose a size for the board (5-50):";
             getline(cin, boardSize);
-        } while (checkInput(boardSize, 5, 100, exit) < 0);
+        } while (checkInput(boardSize, 5, 50, exit) < 0);
 
         // Create a game if input ok/user wants to continue
         if (!exit) {
@@ -47,6 +47,8 @@ int main() {
             initializingDone = false;
             stepCount = 0;
             nextStep = "";
+            // Clear the console by moving the text out of sight, and then re-positioning the cursor to the top-left corner
+            cout << "\033[2J\033[1;1H";
             // Keep asking for new cells as a starting state. Stop when user is done, or wants to exit the game
             while (!exit && !initializingDone) {
                 cout << "This is the game board" << endl;
@@ -63,7 +65,7 @@ int main() {
                         else cout << "Add at least one cell before continuing!" << endl;
                     }
                     // If initializing isn't done and user don't want to exit and input is not a number in range = ask input again
-                } while (!initializingDone && xAxis != "q" && checkInput(xAxis, 0, board.getBoardSize() - 1, exit) < 0);
+                } while (!initializingDone && checkInput(xAxis, 0, board.getBoardSize() - 1, exit) < 0);
 
                 // If initializing not done and user wants to continue, ask for y-axis number
                 if (!initializingDone && !exit) {
@@ -74,7 +76,7 @@ int main() {
                         userInputPlaceholder = checkInput(yAxis, 0, board.getBoardSize() - 1, exit);
                         // If input ok, 'revive' cell with given coordinates
                         if (userInputPlaceholder > 0) {
-                            // Clear the console by moving the text out of sight, and then re-positioning the cursor to the top-left corner
+                            // Clear the console
                             cout << "\033[2J\033[1;1H";
                             board.reviveCell(stoi(xAxis), stoi(yAxis));
                             initialCellCount++;
@@ -88,31 +90,33 @@ int main() {
             if (!exit) {
                 // Start playing the game. End game loop when no more cells change state
                 do {
-                    cout << "Step count: " << stepCount << "\n" << endl;
+                    cout << "Step count: " << stepCount << endl;
 
                     board.printBoard();
                     if (nextStep == "") {
                         cout << "This is the board after " << stepCount << " steps!" << endl;
                         cout << "To continue to the next state, press enter" << endl;
                         cout << "To automatically progress through the game, type 'auto'" << endl;
+                        cout << "To stop the game, type 'stop'" << endl;
                         // Ask for a command to step to next state
                         do {
                             cout << "Command:";
                             getline(cin, nextStep);
-                            if (nextStep != "" && nextStep != "auto") cout << "Invalid input! Press either only enter, or type 'auto' and press enter" << endl;
-                        } while (nextStep != "" && nextStep != "auto");
+                            if (nextStep != "" && nextStep != "auto" && nextStep != "stop") cout << "Invalid input! Press either only enter, or type 'auto'/'stop' and press enter" << endl;
+                        } while (nextStep != "" && nextStep != "auto" && nextStep != "stop");
                     }
                     // Do calculations, and save the amount of changes made
                     changedCellsAmount = board.processNextState();
                     stepCount++;
                     if (nextStep == "auto") {
+                        cout << "If the game starts to loop infinitely, press 'ctrl + c' to stop the application!" << endl;
                         // Wait one second before printing next state
                         std::chrono::seconds duration(1);
                         std::this_thread::sleep_for(duration);
                     }
                     // Clear the console
                     cout << "\033[2J\033[1;1H";
-                } while (changedCellsAmount != 0);
+                } while (changedCellsAmount != 0 && nextStep != "stop");
 
                 cout << "Game completed!" << endl;
                 cout << "Steps: " << stepCount << endl;
